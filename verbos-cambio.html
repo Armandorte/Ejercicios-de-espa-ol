@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verbos de cambio · Ejercicios interactivos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f2;
+    --ink: #1c1a14;
+    --muted: #8a8578;
+    --accent: #c45c1a;
+    --accent-light: #f0e8df;
+    --ok: #2a7a4f;
+    --ok-light: #e8f5ed;
+    --err: #b8293a;
+    --err-light: #fce8ea;
+    --warn: #9a6800;
+    --warn-light: #fdf3dc;
+    --surface: #ffffff;
+    --border: #e2ddd6;
+    --shadow: 0 2px 20px rgba(28,26,20,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* Hero */
+  .hero {
+    background: var(--ink);
+    color: white;
+    padding: 56px 32px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px);
+  }
+  .hero-tag {
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.1;
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .hero h1 em { color: #e8956a; font-style: italic; }
+  .hero p {
+    color: rgba(255,255,255,0.55);
+    font-size: 15px;
+    position: relative;
+  }
+
+  /* Nav tabs */
+  .nav {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .nav-tab {
+    flex: 1;
+    min-width: 140px;
+    padding: 16px 12px;
+    border: none;
+    background: transparent;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-tab:hover { color: var(--ink); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-tab .tab-num {
+    display: inline-block;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: currentColor;
+    color: white;
+    font-size: 10px;
+    line-height: 20px;
+    text-align: center;
+    margin-right: 6px;
+    vertical-align: middle;
+    opacity: 0.8;
+  }
+
+  /* Sections */
+  .section { display: none; max-width: 760px; margin: 0 auto; padding: 40px 20px; }
+  .section.active { display: block; animation: fadeUp 0.3s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header { margin-bottom: 32px; }
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .section-header p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+  /* Score bar */
+  .score-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 28px;
+    font-size: 13px;
+  }
+  .score-bar span { color: var(--muted); }
+  .score-val { font-weight: 700; color: var(--ink); font-size: 15px; }
+  .score-bar .sep { color: var(--border); }
+
+  /* Question cards */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.3s;
+  }
+  .q-card.answered-ok { border-color: var(--ok); }
+  .q-card.answered-err { border-color: var(--err); }
+
+  .q-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-size: 16px;
+    line-height: 1.65;
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+  .q-text strong { color: var(--accent); }
+  .q-hint {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink);
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .opt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-light); }
+  .opt.selected { border-color: var(--accent); background: var(--accent-light); }
+  .opt.correct { border-color: var(--ok); background: var(--ok-light); color: var(--ok); font-weight: 700; }
+  .opt.wrong { border-color: var(--err); background: var(--err-light); color: var(--err); }
+  .opt.show-correct { border-color: var(--ok); background: var(--ok-light); }
+  .opt:disabled { cursor: default; }
+  .opt-letter {
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    background: rgba(28,26,20,0.07);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0;
+  }
+
+  /* Text input */
+  .text-input-wrap { position: relative; }
+  .text-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+    min-height: 80px;
+  }
+  .text-input:focus { border-color: var(--accent); background: white; }
+  .text-input.correct { border-color: var(--ok); background: var(--ok-light); }
+  .text-input.partial { border-color: var(--warn); background: var(--warn-light); }
+  .text-input.wrong { border-color: var(--err); background: var(--err-light); }
+  .text-input:disabled { opacity: 0.8; }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.65;
+    margin-top: 14px;
+  }
+  .feedback.show { display: block; animation: fadeUp 0.2s ease; }
+  .feedback.ok { background: var(--ok-light); border-left: 3px solid var(--ok); color: #1a5535; }
+  .feedback.bad { background: var(--err-light); border-left: 3px solid var(--err); color: #7a1525; }
+  .feedback.warn { background: var(--warn-light); border-left: 3px solid var(--warn); color: #6b4800; }
+  .feedback strong { font-weight: 700; display: block; margin-bottom: 4px; }
+  .feedback .ans { font-weight: 700; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  .btn {
+    padding: 11px 24px;
+    border-radius: 6px;
+    border: none;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #a84d15; }
+  .btn-primary:disabled { opacity: 0.35; cursor: default; }
+  .btn-secondary { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* Results panel */
+  .results-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    margin-top: 24px;
+    box-shadow: var(--shadow);
+  }
+  .results-panel.show { display: block; animation: fadeUp 0.4s ease; }
+  .results-panel h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  .results-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    margin: 16px 0 6px;
+  }
+  .results-label { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .results-grid {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .r-stat {
+    flex: 1;
+    max-width: 120px;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 14px;
+    border: 1px solid var(--border);
+  }
+  .r-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+  .r-num.ok { color: var(--ok); }
+  .r-num.err { color: var(--err); }
+  .r-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .results-msg { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto; }
+
+  /* Ex3 — transformation */
+  .ex3-orig {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .ex3-verb-tag {
+    display: inline-block;
+    background: var(--ink);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  /* Reference pill */
+  .ref-box {
+    background: var(--ink);
+    color: white;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .ref-box h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #e8956a;
+  }
+  .ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 500px) { .ref-grid { grid-template-columns: 1fr 1fr; } }
+  .ref-item { }
+  .ref-verb { font-weight: 700; color: #e8956a; }
+  .ref-def { color: rgba(255,255,255,0.65); font-size: 12px; }
+
+  @media (max-width: 480px) {
+    .q-card { padding: 20px; }
+    .section { padding: 28px 16px; }
+    .results-grid { flex-wrap: wrap; }
+    .nav-tab { font-size: 11px; padding: 14px 8px; min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">B2 · Para brasileños · Léxico</div>
+  <h1>Verbos de cambio<br><em>¿el trabajo te cambia<br>o te cambias tú?</em></h1>
+  <p>3 ejercicios · Corrección inmediata · Con feedback para brasileños</p>
+</div>
+
+<nav class="nav">
+  <button class="nav-tab active" onclick="showSection(0)"><span class="tab-num">1</span>Elige el verbo</button>
+  <button class="nav-tab" onclick="showSection(1)"><span class="tab-num">2</span>Corrige el error</button>
+  <button class="nav-tab" onclick="showSection(2)"><span class="tab-num">3</span>Transforma</button>
+</nav>
+
+<!-- ===== SECCIÓN 1: ELECCIÓN MÚLTIPLE ===== -->
+<div class="section active" id="s0">
+  <div class="section-header">
+    <div class="section-label">Ejercicio 1</div>
+    <h2>Elige el verbo correcto</h2>
+    <p>Una sola respuesta correcta. Piensa en el tipo de cambio antes de elegir.</p>
+  </div>
+
+  <div class="ref-box">
+    <h4>Guía rápida</h4>
+    <div class="ref-grid">
+      <div class="ref-item"><div class="ref-verb">ponerse</div><div class="ref-def">Reacción puntual</div></div>
+      <div class="ref-item"><div class="ref-verb">quedarse</div><div class="ref-def">Resultado/estado</div></div>
+      <div class="ref-item"><div class="ref-verb">volverse</div><div class="ref-def">Cambio gradual</div></div>
+      <div class="ref-item"><div class="ref-verb">hacerse</div><div class="ref-def">Decisión propia</div></div>
+      <div class="ref-item"><div class="ref-verb">convertirse en</div><div class="ref-def">Reconocido externamente</div></div>
+      <div class="ref-item"><div class="ref-verb">llegar a ser</div><div class="ref-def">Logro tras proceso largo</div></div>
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <span>Progreso:</span>
+    <span class="score-val" id="s1-score">0 / 5</span>
+    <span class="sep">|</span>
+    <span id="s1-status">Sin responder</span>
+  </div>
+
+  <div id="s1-questions"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="s1-check" onclick="checkSection1()">Comprobar todo</button>
+    <button class="btn btn-secondary" onclick="resetSection1()">Reiniciar</button>
+  </div>
+  <div class="results-panel" id="s1-results">
+    <h3 id="s1-r-title"></h3>
+    <div class="results-score" id="s1-r-score"></div>
+    <div class="results-label" id="s1-r-label"></div>
+    <div class="results-grid">
+      <div class="r-stat"><div class="r-num ok" id="s1-r-ok">0</div><div class="r-label">Correctas</div></div>
+      <div class="r-stat"><div class="r-num err" id="s1-r-err">0</div><div class="r-label">Incorrectas</div></div>
+    </div>
+    <p class="results-msg" id="s1-r-msg"></p>
+    <button class="btn btn-primary" onclick="resetSection1()">Intentar de nuevo</button>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN 2: CORRECCIÓN DE ERRORES ===== -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <div class="section-label">Ejercicio 2</div>
+    <h2>Corrige el error</h2>
+    <p>Cada frase tiene un error. Identifícalo y escribe la forma correcta.</p>
+  </div>
+
+  <div class="score-bar">
+    <span>Progreso:</span>
+    <span class="score-val" id="s2-score">0 / 5</span>
+    <span class="sep">|</span>
+    <span id="s2-status">Sin responder</span>
+  </div>
+
+  <div id="s2-questions"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="s2-check" onclick="checkSection2()">Comprobar todo</button>
+    <button class="btn btn-secondary" onclick="resetSection2()">Reiniciar</button>
+  </div>
+  <div class="results-panel" id="s2-results">
+    <h3 id="s2-r-title"></h3>
+    <div class="results-score" id="s2-r-score"></div>
+    <div class="results-label" id="s2-r-label"></div>
+    <div class="results-grid">
+      <div class="r-stat"><div class="r-num ok" id="s2-r-ok">0</div><div class="r-label">Correctas</div></div>
+      <div class="r-stat"><div class="r-num err" id="s2-r-err">0</div><div class="r-label">Incorrectas</div></div>
+    </div>
+    <p class="results-msg" id="s2-r-msg"></p>
+    <button class="btn btn-primary" onclick="resetSection2()">Intentar de nuevo</button>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN 3: TRANSFORMACIÓN ===== -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <div class="section-label">Ejercicio 3</div>
+    <h2>Transforma la frase</h2>
+    <p>Reescribe cada frase usando el verbo indicado. Mantén el significado original.</p>
+  </div>
+
+  <div class="score-bar">
+    <span>Progreso:</span>
+    <span class="score-val" id="s3-score">0 / 5</span>
+    <span class="sep">|</span>
+    <span id="s3-status">Sin responder</span>
+  </div>
+
+  <div id="s3-questions"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="s3-check" onclick="checkSection3()">Comprobar todo</button>
+    <button class="btn btn-secondary" onclick="resetSection3()">Reiniciar</button>
+  </div>
+  <div class="results-panel" id="s3-results">
+    <h3 id="s3-r-title"></h3>
+    <div class="results-score" id="s3-r-score"></div>
+    <div class="results-label" id="s3-r-label"></div>
+    <div class="results-grid">
+      <div class="r-stat"><div class="r-num ok" id="s3-r-ok">0</div><div class="r-label">Correctas</div></div>
+      <div class="r-stat"><div class="r-num err" id="s3-r-err">0</div><div class="r-label">Incorrectas</div></div>
+    </div>
+    <p class="results-msg" id="s3-r-msg"></p>
+    <button class="btn btn-primary" onclick="resetSection3()">Intentar de nuevo</button>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+
+const s1Data = [
+  {
+    text: 'Desde que asumió la dirección del proyecto, Ana __________ mucho más exigente con los plazos.',
+    hint: '(ponerse / volverse / hacerse)',
+    options: ['ponerse → se puso', 'volverse → se ha vuelto', 'hacerse → se hizo'],
+    answer: 1,
+    fb_ok: '✓ Correcto. <b>Volverse</b> expresa un cambio gradual de carácter o actitud — exactamente lo que ocurre cuando alguien asume una posición de liderazgo.',
+    fb_bad: 'Lo correcto es <b>se ha vuelto</b>. <b>Ponerse</b> sería para una reacción puntual; <b>hacerse</b> implica una decisión propia. Aquí el cambio es gradual y de carácter → volverse.'
+  },
+  {
+    text: 'Durante la presentación ante el consejo, el director __________ completamente en blanco.',
+    hint: '(quedarse / convertirse / hacerse)',
+    options: ['quedarse → se quedó', 'convertirse → se convirtió en', 'hacerse → se hizo'],
+    answer: 0,
+    fb_ok: '✓ Correcto. <b>Quedarse</b> expresa el resultado o estado al que se llega — aquí, el resultado de un bloqueo repentino.',
+    fb_bad: 'Lo correcto es <b>se quedó</b>. "Quedarse en blanco" es una expresión fija que significa bloquearse sin palabras. Ni convertirse ni hacerse funcionan aquí.'
+  },
+  {
+    text: 'Tras cinco años liderando equipos internacionales, __________ en una de las voces más respetadas de la empresa.',
+    hint: '(ponerse / convertirse en / quedarse)',
+    options: ['ponerse → se puso', 'convertirse en → se convirtió', 'quedarse → se quedó'],
+    answer: 1,
+    fb_ok: '✓ Correcto. <b>Convertirse en</b> expresa una transformación profunda reconocida externamente — aquí, el reconocimiento del entorno profesional.',
+    fb_bad: 'Lo correcto es <b>se convirtió en</b>. Es la única opción que expresa transformación con reconocimiento externo. Ponerse y quedarse no tienen ese valor.'
+  },
+  {
+    text: 'Con tanto trabajo acumulado, la situación __________ insostenible para todo el equipo.',
+    hint: '(volverse / hacerse / tornarse)',
+    options: ['volverse → se volvió', 'hacerse → se hizo', 'tornarse → se tornó'],
+    answer: 0,
+    fb_ok: '✓ Correcto. <b>Volverse</b> para cambios progresivos de estado o situación. <b>Tornarse</b> también es posible, pero es literario y poco natural en B2.',
+    fb_bad: 'Lo correcto es <b>se volvió</b>. <b>Hacerse</b> implica decisión propia — no aplica a situaciones. <b>Tornarse</b> existe, pero es literario; en B2 se prefiere volverse.'
+  },
+  {
+    text: 'Su sueño siempre fue __________ consultora independiente, y al final lo logró.',
+    hint: '(quedarse / hacerse / ponerse)',
+    options: ['quedarse → quedarse', 'hacerse → hacerse', 'ponerse → ponerse'],
+    answer: 1,
+    fb_ok: '✓ Correcto. <b>Hacerse</b> para cambios por decisión y esfuerzo propios. Aquí hay un proyecto personal perseguido durante años.',
+    fb_bad: 'Lo correcto es <b>hacerse</b>. Es el único que expresa cambio por decisión y esfuerzo propio. Ponerse es para reacciones; quedarse para resultados/estados.'
+  }
+];
+
+const s2Data = [
+  {
+    text: '"La empresa <u>viró</u> líder del mercado en menos de tres años."',
+    hint: '⚠️ Calco del portugués: <em>virar</em>',
+    answers: ['se convirtió en', 'se convirtió en líder'],
+    accept: ['convirti', 'convirtió en'],
+    fb_ok: '✓ Correcto. <b>Virar</b> en español significa girar o dar la vuelta — nunca transformarse. Es un calco directo de <em>virar</em> en portugués, error inmediato de identificación como hablante no nativo.',
+    fb_bad: 'La corrección es <b>"se convirtió en líder del mercado"</b>. <b>Virar</b> en español = girar. Para transformación → convertirse en / hacerse.',
+    model: 'se convirtió en líder del mercado en menos de tres años.'
+  },
+  {
+    text: '"Después de la reestructuración, el ambiente <u>quedó</u> muy tenso."',
+    hint: '⚠️ ¿Es incorrecto o solo impreciso?',
+    answers: ['se volvió', 'estaba', 'se puso'],
+    accept: ['volvió', 'puso', 'estaba'],
+    fb_ok: '✓ Bien detectado. <b>Se volvió</b> es la opción más precisa: el cambio fue gradual y progresivo. <b>Se puso</b> también sería aceptable si lo vemos como reacción puntual.',
+    fb_bad: 'Aquí <b>quedó</b> sin pronombre es el error — en español siempre <b>quedarse</b> (con se). Pero más natural aún es <b>se volvió muy tenso</b> para indicar un cambio progresivo de ambiente.',
+    model: 'se volvió muy tenso. (o: se puso muy tenso)'
+  },
+  {
+    text: '"Tras tanto esfuerzo, el equipo <u>llegó a ser</u> sin recursos."',
+    hint: '⚠️ Llegar a ser implica logro positivo',
+    answers: ['se quedó', 'quedó'],
+    accept: ['quedó', 'quedaron'],
+    fb_ok: '✓ Correcto. <b>Llegar a ser</b> implica siempre un logro destacado y positivo — no puede usarse para resultados negativos como "sin recursos".',
+    fb_bad: 'Lo correcto es <b>"se quedó sin recursos"</b>. <b>Llegar a ser</b> = logro positivo tras proceso largo. Para resultados negativos → quedarse.',
+    model: 'se quedó sin recursos.'
+  },
+  {
+    text: '"Su gestión <u>se tornó</u> un ejemplo para toda la organización." (¿incorrecto o poco natural?)',
+    hint: '⚠️ Tornarse: ¿registro?',
+    answers: ['se convirtió en', 'se volvió'],
+    accept: ['convirti', 'volvió', 'convirtio'],
+    fb_ok: '✓ Bien identificado. <b>Tornarse</b> no es incorrecto, pero es literario y formal. En B2 se prefiere <b>se convirtió en</b> o <b>se volvió</b> — mucho más naturales.',
+    fb_bad: 'Tornarse no es incorrecto, pero es literario. Lo natural en B2 es <b>"se convirtió en un ejemplo"</b> (transformación reconocida) o <b>"se volvió un ejemplo"</b> (cambio progresivo).',
+    model: 'se convirtió en un ejemplo para toda la organización.'
+  },
+  {
+    text: '"Al conocer los resultados, todos <u>se hicieron</u> sorprendidos."',
+    hint: '⚠️ Calco del portugués: ficaram surpresos',
+    answers: ['se pusieron', 'quedaron', 'se quedaron'],
+    accept: ['pusieron', 'quedaron', 'sorprendi'],
+    fb_ok: '✓ Correcto. <b>Ponerse</b> para reacciones emocionales puntuales. <b>Hacerse sorprendido</b> es un calco de <em>ficar surpreso</em> — no existe en español.',
+    fb_bad: 'Lo correcto es <b>"se pusieron sorprendidos"</b>. Reacción emocional puntual = <b>ponerse</b>. Hacerse implica decisión propia — no aplica a reacciones. Calco de <em>ficar surpreso</em>.',
+    model: 'se pusieron sorprendidos.'
+  }
+];
+
+const s3Data = [
+  {
+    orig: 'Ahora es una persona muy desconfiada. Antes no era así.',
+    verb: 'volverse',
+    hint: '→ Cambio gradual de carácter',
+    accept: ['vuelto muy desconfiada', 'volvió muy desconfiada', 'vuelto desconfiada', 'volvió desconfiada', 'volverse desconfiada'],
+    fb_ok: '✓ Correcto. <b>Volverse</b> para cambios graduales de carácter o actitud.',
+    fb_bad: 'Una posible respuesta: <b>"Se ha vuelto muy desconfiada"</b> o <b>"Se volvió muy desconfiada"</b>. Volverse = cambio gradual de carácter.',
+    model: 'Se ha vuelto muy desconfiada. (Antes no era así.)'
+  },
+  {
+    orig: 'Después de la noticia, no pudo decir nada.',
+    verb: 'quedarse',
+    hint: '→ Resultado de un estado al que se llega',
+    accept: ['quedó sin palabras', 'quedó muda', 'quedó sin habla', 'quedó callada', 'quedó paralizada'],
+    fb_ok: '✓ Correcto. <b>Quedarse</b> para el resultado o estado al que se llega — aquí, el estado de no poder hablar.',
+    fb_bad: 'Una respuesta posible: <b>"Se quedó sin palabras"</b> o <b>"Se quedó muda"</b>. Quedarse = resultado/estado al que se llega.',
+    model: 'Se quedó sin palabras después de la noticia.'
+  },
+  {
+    orig: 'Trabajó durante diez años hasta alcanzar el puesto de directora regional.',
+    verb: 'llegar a ser',
+    hint: '→ Logro tras proceso largo',
+    accept: ['llegó a ser directora', 'llegar a ser directora'],
+    fb_ok: '✓ Correcto. <b>Llegar a ser</b> enfatiza el recorrido largo y el logro al final del camino.',
+    fb_bad: 'Una posible respuesta: <b>"Llegó a ser directora regional tras diez años de trabajo"</b>. Llegar a ser = logro tras proceso largo.',
+    model: 'Llegó a ser directora regional tras diez años de trabajo.'
+  },
+  {
+    orig: 'Decidió por sí misma montar su propio negocio.',
+    verb: 'hacerse',
+    hint: '→ Cambio por decisión y esfuerzo propios',
+    accept: ['se hizo empresaria', 'se hizo dueña', 'hacerse empresaria', 'se hizo autónoma', 'hizo empresaria'],
+    fb_ok: '✓ Correcto. <b>Hacerse</b> para cambios por decisión propia y esfuerzo personal.',
+    fb_bad: 'Una posible respuesta: <b>"Se hizo empresaria"</b> o <b>"Se hizo dueña de su propio negocio"</b>. Hacerse = decisión y esfuerzo propios.',
+    model: 'Se hizo empresaria / dueña de su propio negocio.'
+  },
+  {
+    orig: 'Todo el mundo la reconoce ahora como la experta en transformación digital del sector.',
+    verb: 'convertirse en',
+    hint: '→ Transformación reconocida externamente',
+    accept: ['se ha convertido en', 'se convirtió en', 'convertido en la experta', 'convertido en experta'],
+    fb_ok: '✓ Correcto. <b>Convertirse en</b> para transformaciones reconocidas y validadas por otros.',
+    fb_bad: 'Una posible respuesta: <b>"Se ha convertido en la experta en transformación digital del sector"</b>. Convertirse en = transformación reconocida externamente.',
+    model: 'Se ha convertido en la experta en transformación digital del sector.'
+  }
+];
+
+// ===== RENDER SECTION 1 =====
+function renderS1() {
+  const container = document.getElementById('s1-questions');
+  container.innerHTML = '';
+  s1Data.forEach((q, i) => {
+    const letters = ['A', 'B', 'C'];
+    let optsHTML = q.options.map((opt, j) =>
+      `<button class="opt" id="s1-opt-${i}-${j}" onclick="selectS1(${i},${j})"
+        data-index="${j}"><span class="opt-letter">${letters[j]}</span>${opt}</button>`
+    ).join('');
+    container.innerHTML += `
+      <div class="q-card" id="s1-card-${i}">
+        <div class="q-num">Pregunta ${i+1} de ${s1Data.length}</div>
+        <div class="q-text">${q.text.replace('__________','<strong>__________</strong>')}</div>
+        <div class="q-hint">${q.hint}</div>
+        <div class="options">${optsHTML}</div>
+        <div class="feedback" id="s1-fb-${i}"></div>
+      </div>`;
+  });
+}
+
+let s1Selected = new Array(s1Data.length).fill(null);
+let s1Done = false;
+
+function selectS1(qi, oi) {
+  if (s1Done) return;
+  s1Selected[qi] = oi;
+  s1Data[qi].options.forEach((_, j) => {
+    document.getElementById(`s1-opt-${qi}-${j}`).classList.toggle('selected', j === oi);
+  });
+}
+
+function checkSection1() {
+  if (s1Done) return;
+  s1Done = true;
+  let correct = 0;
+  s1Data.forEach((q, i) => {
+    const sel = s1Selected[i];
+    const card = document.getElementById(`s1-card-${i}`);
+    const fb = document.getElementById(`s1-fb-${i}`);
+    q.options.forEach((_, j) => {
+      const btn = document.getElementById(`s1-opt-${i}-${j}`);
+      btn.disabled = true;
+      btn.classList.remove('selected');
+      if (j === q.answer) btn.classList.add('correct');
+      else if (j === sel && sel !== q.answer) btn.classList.add('wrong');
+    });
+    const ok = sel === q.answer;
+    if (ok) correct++;
+    card.classList.add(ok ? 'answered-ok' : 'answered-err');
+    fb.className = `feedback show ${ok ? 'ok' : 'bad'}`;
+    fb.innerHTML = `<strong>${ok ? '✓ Correcto' : '✗ Incorrecto'}</strong>${ok ? q.fb_ok : q.fb_bad}`;
+  });
+  document.getElementById('s1-score').textContent = `${correct} / ${s1Data.length}`;
+  document.getElementById('s1-status').textContent = `${correct} correctas`;
+  document.getElementById('s1-check').disabled = true;
+  showResults('s1', correct, s1Data.length);
+}
+
+function resetSection1() {
+  s1Selected = new Array(s1Data.length).fill(null);
+  s1Done = false;
+  document.getElementById('s1-score').textContent = `0 / ${s1Data.length}`;
+  document.getElementById('s1-status').textContent = 'Sin responder';
+  document.getElementById('s1-check').disabled = false;
+  document.getElementById('s1-results').classList.remove('show');
+  renderS1();
+}
+
+// ===== RENDER SECTION 2 =====
+function renderS2() {
+  const container = document.getElementById('s2-questions');
+  container.innerHTML = '';
+  s2Data.forEach((q, i) => {
+    container.innerHTML += `
+      <div class="q-card" id="s2-card-${i}">
+        <div class="q-num">Frase ${i+1} de ${s2Data.length}</div>
+        <div class="q-text">${q.text}</div>
+        <div class="q-hint">${q.hint}</div>
+        <div class="text-input-wrap">
+          <input type="text" class="text-input" id="s2-input-${i}"
+            placeholder="Escribe la corrección..." autocomplete="off" autocorrect="off" spellcheck="false"
+            onkeydown="if(event.key==='Enter') checkSection2()">
+        </div>
+        <div class="feedback" id="s2-fb-${i}"></div>
+      </div>`;
+  });
+}
+
+let s2Done = false;
+
+function checkSection2() {
+  if (s2Done) return;
+  s2Done = true;
+  let correct = 0;
+  s2Data.forEach((q, i) => {
+    const val = document.getElementById(`s2-input-${i}`).value.trim().toLowerCase();
+    const input = document.getElementById(`s2-input-${i}`);
+    const card = document.getElementById(`s2-card-${i}`);
+    const fb = document.getElementById(`s2-fb-${i}`);
+    input.disabled = true;
+    const ok = q.accept.some(a => val.includes(a.toLowerCase()));
+    if (ok) correct++;
+    input.classList.add(ok ? 'correct' : 'wrong');
+    card.classList.add(ok ? 'answered-ok' : 'answered-err');
+    fb.className = `feedback show ${ok ? 'ok' : 'bad'}`;
+    fb.innerHTML = `<strong>${ok ? '✓ Bien corregido' : '✗ Incorrecto'}</strong>${ok ? q.fb_ok : q.fb_bad}<br><br>📝 Modelo: <span class="ans">${q.model}</span>`;
+  });
+  document.getElementById('s2-score').textContent = `${correct} / ${s2Data.length}`;
+  document.getElementById('s2-status').textContent = `${correct} correctas`;
+  document.getElementById('s2-check').disabled = true;
+  showResults('s2', correct, s2Data.length);
+}
+
+function resetSection2() {
+  s2Done = false;
+  document.getElementById('s2-score').textContent = `0 / ${s2Data.length}`;
+  document.getElementById('s2-status').textContent = 'Sin responder';
+  document.getElementById('s2-check').disabled = false;
+  document.getElementById('s2-results').classList.remove('show');
+  renderS2();
+}
+
+// ===== RENDER SECTION 3 =====
+function renderS3() {
+  const container = document.getElementById('s3-questions');
+  container.innerHTML = '';
+  s3Data.forEach((q, i) => {
+    container.innerHTML += `
+      <div class="q-card" id="s3-card-${i}">
+        <div class="q-num">Transformación ${i+1} de ${s3Data.length}</div>
+        <div class="ex3-orig">${q.orig}</div>
+        <div class="ex3-verb-tag">Usa: ${q.verb}</div>
+        <div class="q-hint">${q.hint}</div>
+        <textarea class="text-input" id="s3-input-${i}"
+          placeholder="Escribe la frase transformada..." rows="2"></textarea>
+        <div class="feedback" id="s3-fb-${i}"></div>
+      </div>`;
+  });
+}
+
+let s3Done = false;
+
+function checkSection3() {
+  if (s3Done) return;
+  s3Done = true;
+  let correct = 0;
+  s3Data.forEach((q, i) => {
+    const val = document.getElementById(`s3-input-${i}`).value.trim().toLowerCase();
+    const input = document.getElementById(`s3-input-${i}`);
+    const card = document.getElementById(`s3-card-${i}`);
+    const fb = document.getElementById(`s3-fb-${i}`);
+    input.disabled = true;
+    const ok = q.accept.some(a => val.includes(a.toLowerCase())) && val.length > 8;
+    if (ok) correct++;
+    input.classList.add(ok ? 'correct' : 'wrong');
+    card.classList.add(ok ? 'answered-ok' : 'answered-err');
+    fb.className = `feedback show ${ok ? 'ok' : 'bad'}`;
+    fb.innerHTML = `<strong>${ok ? '✓ Correcto' : '✗ Revisa'}</strong>${ok ? q.fb_ok : q.fb_bad}<br><br>📝 Modelo: <span class="ans">${q.model}</span>`;
+  });
+  document.getElementById('s3-score').textContent = `${correct} / ${s3Data.length}`;
+  document.getElementById('s3-status').textContent = `${correct} correctas`;
+  document.getElementById('s3-check').disabled = true;
+  showResults('s3', correct, s3Data.length);
+}
+
+function resetSection3() {
+  s3Done = false;
+  document.getElementById('s3-score').textContent = `0 / ${s3Data.length}`;
+  document.getElementById('s3-status').textContent = 'Sin responder';
+  document.getElementById('s3-check').disabled = false;
+  document.getElementById('s3-results').classList.remove('show');
+  renderS3();
+}
+
+// ===== SHARED =====
+function showResults(prefix, correct, total) {
+  const pct = Math.round(correct/total*100);
+  const panel = document.getElementById(`${prefix}-results`);
+  document.getElementById(`${prefix}-r-score`).textContent = `${correct}/${total}`;
+  document.getElementById(`${prefix}-r-label`).textContent = `${pct}% de acierto`;
+  document.getElementById(`${prefix}-r-ok`).textContent = correct;
+  document.getElementById(`${prefix}-r-err`).textContent = total - correct;
+  let title, msg;
+  if (pct === 100) { title = '¡Perfecto!'; msg = 'Sin errores. Dominas estos verbos.'; }
+  else if (pct >= 60) { title = '¡Buen trabajo!'; msg = 'Repasa los que fallaste y vuelve a intentarlo.'; }
+  else { title = 'Sigue practicando'; msg = 'Vuelve a la guía rápida antes de intentarlo de nuevo.'; }
+  document.getElementById(`${prefix}-r-title`).textContent = title;
+  document.getElementById(`${prefix}-r-msg`).textContent = msg;
+  panel.classList.add('show');
+}
+
+function showSection(i) {
+  document.querySelectorAll('.section').forEach((s,j) => s.classList.toggle('active', i===j));
+  document.querySelectorAll('.nav-tab').forEach((t,j) => t.classList.toggle('active', i===j));
+}
+
+// Init
+renderS1(); renderS2(); renderS3();
+</script>
+</body>
+</html>
